@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hastane Arama - Deri Hastalığı Teşhisi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #5c67f2 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .main-container {
+            padding: 30px 0;
+        }
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .search-input {
+            border-radius: 25px;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .hospital-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #5c67f2;
+            padding: 20px;
+        }
+        .hospital-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .hospital-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .hospital-type {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .hospital-info {
+            margin-bottom: 10px;
+        }
+        .hospital-info i {
+            color: #5c67f2;
+            width: 20px;
+            margin-right: 10px;
+        }
+        .dermatology-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .dermatology-badge.no {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        .spinner-border {
+            color: #5c67f2;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-stethoscope mr-2"></i>
+                Deri Hastalığı Teşhisi
+            </a>
+            <div class="navbar-nav ml-auto">
+                <a class="nav-link" href="{% url 'home' %}">
+                    <i class="fas fa-home mr-1"></i>Ana Sayfa
+                </a>
+                <a class="nav-link active" href="{% url 'hospital_search' %}">
+                    <i class="fas fa-hospital mr-1"></i>Hastaneler
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <div class="search-card">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-hospital text-primary mr-2"></i>
+                Hastane Ara
+            </h2>
+            <input type="text" id="searchInput" class="search-input" placeholder="Hastane adı veya şehir girin...">
+            <div id="locationStatus" class="mt-2 text-center"></div>
+        </div>
+        <div id="resultsContainer">
+            <div id="hospitalsList"></div>
+        </div>
+    </div>
+
+    <!-- Konum başarıyla alındı toast -->
+    <div class="toast position-fixed" id="locationToast" style="top: 30px; right: 30px; z-index: 9999;" data-delay="2000" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header bg-success text-white">
+        <i class="fas fa-check-circle mr-2"></i>
+        <strong class="mr-auto">Başarılı</strong>
+        <small>Şimdi</small>
+        <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast" aria-label="Kapat">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        Konum başarıyla alındı!
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Arama kutusu ile API'den hastane arama
+        let searchTimeout = null;
+        let userLocation = null;
+        let lastQuery = '';
+
+        // Sayfa yüklenince konum al ve konuma göre hastane ara
+        $(document).ready(function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    userLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    };
+                    // Popup (toast) ile göster
+                    $('#locationToast').toast('show');
+                    $('#locationStatus').html('');
+                    searchHospitalsByLocation(userLocation.latitude, userLocation.longitude);
+                }, function(error) {
+                    $('#locationStatus').html('<span class="error-message">Konum alınamadı. Sadece arama kutusunu kullanabilirsiniz.</span>');
+                });
+            } else {
+                $('#locationStatus').html('<span class="error-message">Tarayıcınız konum özelliğini desteklemiyor.</span>');
+            }
+        });
+
+        // Arama kutusu ile arama
+        $('#searchInput').on('input', function() {
+            clearTimeout(searchTimeout);
+            const query = $(this).val().trim();
+            lastQuery = query;
+            if (query.length < 2) {
+                if (userLocation) {
+                    searchHospitalsByLocation(userLocation.latitude, userLocation.longitude);
+                } else {
+                    $('#hospitalsList').html('<div class="alert alert-info">Lütfen aramak için en az 2 karakter girin.</div>');
+                }
+                return;
+            }
+            $('#hospitalsList').html('<div class="loading"><div class="spinner-border"></div> Hastaneler aranıyor...</div>');
+            searchTimeout = setTimeout(function() {
+                searchHospitals(query);
+            }, 500);
+        });
+
+        // Konuma göre hastane arama fonksiyonu
+        function searchHospitalsByLocation(lat, lon, query = 'hastane', limit = 10, km = 10) {
+            const delta = km / 111;
+            const left = lon - delta;
+            const right = lon + delta;
+            const top = lat + delta;
+            const bottom = lat - delta;
+            const url = `https://nominatim.openstreetmap.org/search?` +
+                `q=${encodeURIComponent(query)}` +
+                `&format=json&limit=${limit}` +
+                `&viewbox=${left},${top},${right},${bottom}` +
+                `&bounded=1`;
+            $('#hospitalsList').html('<div class="loading"><div class="spinner-border"></div> Hastaneler aranıyor...</div>');
+            fetch(url, {
+                headers: { 'User-Agent': 'DeriHastaligiTeshisi/1.0 (your@email.com)' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                showHospitals(data);
+            })
+            .catch(() => {
+                $('#hospitalsList').html('<div class="alert alert-danger">Hastane verisi alınamadı.</div>');
+            });
+        }
+
+        // Arama kutusu ile hastane arama fonksiyonu
+        function searchHospitals(query) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&extratags=1`;
+            fetch(url, {
+                headers: { 'User-Agent': 'DeriHastaligiTeshisi/1.0 (your@email.com)' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                showHospitals(data);
+            })
+            .catch(() => {
+                $('#hospitalsList').html('<div class="alert alert-danger">Hastane verisi alınamadı.</div>');
+            });
+        }
+
+        // Sonuçları ekrana basan fonksiyon
+        function showHospitals(data) {
+            if (!data || data.length === 0) {
+                $('#hospitalsList').html('<div class="alert alert-info">Aradığınız kritere uygun hastane bulunamadı.</div>');
+                return;
+            }
+            let html = '';
+            data.forEach(hospital => {
+                html += `
+                    <div class="hospital-card">
+                        <div class="hospital-name">${hospital.display_name}</div>
+                        <div class="hospital-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <strong>Konum:</strong> ${hospital.lat}, ${hospital.lon}
+                        </div>
+                        <a href="https://maps.google.com/?q=${hospital.lat},${hospital.lon}" target="_blank" class="btn btn-sm btn-primary mt-2">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                `;
+            });
+            $('#hospitalsList').html(html);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Ankara Şehir Hastanesi",
+    "hospital_type": "devlet",
+    "address": "Bilkent, Ankara",
+    "city": "Ankara",
+    "district": "Çankaya",
+    "phone": "0312 333 33 33",
+    "website": "https://ankarasehir.saglik.gov.tr/",
+    "latitude": 39.9208,
+    "longitude": 32.8541,
+    "has_dermatology": true,
+    "dermatology_phone": "0312 333 33 34"
+  },
+  {
+    "name": "İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi Hastanesi",
+    "hospital_type": "universite",
+    "address": "Cerrahpaşa, Fatih, İstanbul",
+    "city": "İstanbul",
+    "district": "Fatih",
+    "phone": "0212 414 30 00",
+    "website": "https://cerrahpasa.istanbul.edu.tr/",
+    "latitude": 41.0082,
+    "longitude": 28.9784,
+    "has_dermatology": true,
+    "dermatology_phone": "0212 414 30 01"
+  },
+  {
+    "name": "İzmir Özel Egepol Hastanesi",
+    "hospital_type": "ozel",
+    "address": "Yenişehir, İzmir",
+    "city": "İzmir",
+    "district": "Konak",
+    "phone": "0232 433 22 22",
+    "website": "https://egepolhastanesi.com/",
+    "latitude": 38.4192,
+    "longitude": 27.1287,
+    "has_dermatology": false,
+    "dermatology_phone": null
+  },
+  {
+    "name": "Bursa Yüksek İhtisas Eğitim ve Araştırma Hastanesi",
+    "hospital_type": "egitim",
+    "address": "Yıldırım, Bursa",
+    "city": "Bursa",
+    "district": "Yıldırım",
+    "phone": "0224 360 50 50",
+    "website": "https://bursayuksekihtisas.saglik.gov.tr/",
+    "latitude": 40.1826,
+    "longitude": 29.0665,
+    "has_dermatology": true,
+    "dermatology_phone": "0224 360 50 51"
+  }
+] 

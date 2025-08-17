@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deri Hastalığı Teşhisi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #5c67f2 !important;
+            box-shadow: 0 2px 8px rgba(92,103,242,0.08);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-size: 1.1rem;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .main-content {
+            min-height: calc(100vh - 100px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 0 20px 0;
+        }
+        .page-title {
+            font-size: 2.3rem;
+            font-weight: bold;
+            color: #3a3a6a;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(92,103,242,0.10);
+            padding: 48px 36px 36px 36px;
+            margin: 24px 0;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(92,103,242,0.16);
+        }
+        .feature-icon {
+            font-size: 4.2rem;
+            color: #5c67f2;
+            margin-bottom: 22px;
+        }
+        .btn-feature {
+            background: linear-gradient(135deg, #5c67f2, #4752d9);
+            border: none;
+            border-radius: 25px;
+            padding: 16px 40px;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            margin-top: 22px;
+            font-size: 1.15rem;
+            box-shadow: 0 2px 8px rgba(92,103,242,0.08);
+        }
+        .btn-feature:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(92, 103, 242, 0.18);
+            color: white;
+            text-decoration: none;
+        }
+        .diagnosis-flex {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+        }
+        .diagnosis-result-box {
+            background: #f4f7ff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(92,103,242,0.07);
+            padding: 32px 24px;
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            align-items: center;
+        }
+        .diagnosis-result-box h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .diagnosis-image-box {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(92,103,242,0.07);
+            padding: 32px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            max-width: 350px;
+        }
+        .diagnosis-image-box img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #444;
+        }
+        .form-control-file {
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 10px;
+        }
+        #imagePreview {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            max-height: 250px;
+            object-fit: contain;
+            margin-top: 15px;
+        }
+        @media (max-width: 991px) {
+            .main-content {
+                flex-direction: column;
+                padding: 10px 0;
+            }
+            .feature-card {
+                margin: 20px 0;
+                min-height: unset;
+            }
+            .diagnosis-flex {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .diagnosis-image-box, .diagnosis-result-box {
+                padding: 18px 10px;
+            }
+        }
+    </style>
+    <script>
+        function previewImage(event) {
+            const output = document.getElementById('imagePreview');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-stethoscope mr-2"></i>
+                Deri Hastalığı Teşhisi
+            </a>
+            <div class="navbar-nav ml-auto">
+                <a class="nav-link active" href="{% url 'home' %}">
+                    <i class="fas fa-home mr-1"></i>Ana Sayfa
+                </a>
+                <a class="nav-link" href="{% url 'hospital_search' %}">
+                    <i class="fas fa-hospital mr-1"></i>Hastaneler
+                </a>
+                <a class="nav-link" href="{% url 'chat' %}">
+                    <i class="fas fa-comments mr-1"></i>Canlı Destek
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-title">Deri Hastalığı Teşhisi</div>
+            <div class="row justify-content-center">
+                <!-- Teşhis Kartı -->
+                <div class="col-lg-7 col-md-10 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3 style="font-weight:bold; color:#3a3a6a;">Deri Hastalığı Teşhisi</h3>
+                        <p style="color:#555;">Yapay zeka destekli sistem ile deri lezyonlarınızı analiz edin ve ön teşhis alın.</p>
+                        <form id="diagnosisForm" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="image">Lütfen teşhis edilecek deri fotoğrafını yükleyin:</label>
+                                <input type="file" id="image" name="image" class="form-control-file" accept="image/*" required onchange="previewImage(event)">
+                                <img id="imagePreview" style="display:none; max-width: 100%;" alt="Seçilen Görsel">
+                            </div>
+                            <button type="submit" class="btn btn-feature btn-block">Teşhis Et</button>
+                        </form>
+                        {% if error %}
+                        <div class="result" style="background:#ffeaea; color:#b30000;">
+                            <h2>{{error}}</h2>
+                        </div>
+                        {% endif %}
+
+                        {% if predicted_diagnosis %}
+                        <div class="diagnosis-flex mt-4">
+                            <div class="diagnosis-result-box">
+                                <h2>Sonuç</h2>
+                                <div style="font-size:1.2rem; font-weight:600; text-align:center;">{{predicted_diagnosis}}</div>
+                                <button class="btn btn-feature mt-4 mx-auto" onclick="goToHospitalSearch()">
+                                    <i class="fas fa-hospital mr-2"></i>Uygun Hastane Ara
+                                </button>
+                            </div>
+                            <div class="diagnosis-image-box">
+                                <img src="/static/img/{{image_name}}" alt="Yüklenen Görsel">
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teşhis Sonucu Modalı -->
+    {% if predicted_diagnosis %}
+    <div class="modal fade" id="diagnosisModal" tabindex="-1" role="dialog" aria-labelledby="diagnosisModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title w-100 text-center" id="diagnosisModalLabel">Teşhis Sonucu</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body d-flex flex-column align-items-center justify-content-center">
+            <div style="font-size:1.3rem; font-weight:600; text-align:center;">{{predicted_diagnosis}}</div>
+            <button class='btn btn-feature mt-4 mx-auto' onclick="goToHospitalSearch()">
+                <i class="fas fa-hospital mr-2"></i>Uygun Hastane Ara
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#diagnosisModal').modal('show');
+        });
+    </script>
+    {% else %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% endif %}
+
+    <script>
+    function goToHospitalSearch() {
+        window.location.href = "{% url 'hospital_search' %}";
+    }
+    </script>
+</body>
+</html>
